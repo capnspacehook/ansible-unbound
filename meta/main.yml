@@ -1,4 +1,5 @@
 galaxy_info:
+  role_name: unbound
   author: Andrew LeFevre
   description: Deploys Unbound with an opinionated configuration
 
