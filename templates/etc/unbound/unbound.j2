@@ -1,0 +1,25 @@
+{{ ansible_managed | comment }}
+
+server:
+    interface: 127.0.0.1
+    access-control: 127.0.0.0/8 allow
+    do-ip6: no
+    logfile: "/etc/unbound/unbound.log"
+    tls-cert-bundle: "/etc/ssl/certs/ca-certificates.crt"
+    auto-trust-anchor-file: "/var/lib/unbound/root.key"
+
+    hide-identity: yes
+    hide-version: yes
+    harden-algo-downgrade: yes
+    qname-minimisation: yes
+
+forward-zone:
+    name: "."
+    forward-tls-upstream: yes
+    forward-addr: 9.9.9.9@853#dns.quad9.net
+    forward-addr: 149.112.112.112@853#dns.quad9.net
+    forward-addr: 1.1.1.1@853#cloudflare-dns.com
+    forward-addr: 1.0.0.1@853#cloudflare-dns.com
+
+remote-control:
+    control-enable: no

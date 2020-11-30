@@ -1,0 +1,40 @@
+---
+
+- name: Install unbound
+  package:
+    name:
+      - ca-certificates
+      - unbound
+    state: present
+
+- name: Create unbound trust anchor
+  become: yes
+  become_user: unbound
+  command:
+    cmd: /usr/sbin/unbound-anchor -a /var/lib/unbound/root.key -4
+    creates: /var/lib/unbound/root.key
+  register: unbound_anchor
+  failed_when: unbound_anchor.rc > 1
+
+- name: Configure unbound
+  template:
+    src: etc/unbound/unbound.j2
+    dest: /etc/unbound/unbound.conf
+    owner: unbound
+    group: unbound
+    mode: '0640'
+    validate: /usr/sbin/unbound-checkconf %s
+
+- name: Set unbound as system resolver
+  template:
+    src: etc/resolv.j2
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Start unbound
+  service:
+    name: unbound
+    enabled: true
+    state: started
