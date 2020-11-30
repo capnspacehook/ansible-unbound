@@ -1,4 +1,4 @@
-Role Name
+ansible-unbound
 =========
 
 A simple, opinionated ansible role to install unbound.
