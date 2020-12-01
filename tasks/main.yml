@@ -8,13 +8,15 @@
     state: present
 
 - name: Create unbound trust anchor
-  become: yes
-  become_user: unbound
   command:
     cmd: /usr/sbin/unbound-anchor -a /var/lib/unbound/root.key -4
     creates: /var/lib/unbound/root.key
   register: unbound_anchor
-  failed_when: unbound_anchor.rc > 1
+  failed_when: |
+    unbound_anchor.rc == 0 and 
+    unbound_anchor.stderr is defined and
+    ("Please check root.key" in unbound_anchor.stderr or
+    "error:" in unbound_anchor.stderr)
 
 - name: Configure unbound
   template:
@@ -22,8 +24,9 @@
     dest: /etc/unbound/unbound.conf
     owner: unbound
     group: unbound
-    mode: '0640'
+    mode: '0644'
     validate: /usr/sbin/unbound-checkconf %s
+  notify: Restart unbound
 
 - name: Set unbound as system resolver
   template:
@@ -33,8 +36,11 @@
     group: root
     mode: '0644'
 
-- name: Start unbound
+- name: Start and enable unbound
   service:
     name: unbound
     enabled: true
     state: started
+
+- name: Flush handlers
+  meta: flush_handlers
