@@ -36,6 +36,13 @@
     group: root
     mode: '0644'
 
+- name: Ensure unbound will stay as the system resolver
+  file:
+    path: /etc/resolv.conf
+    attributes: "+i"
+  register: resolv_file
+  changed_when: "'i' not in resolv_file.diff.before.attributes"
+
 - name: Start and enable unbound
   service:
     name: unbound
