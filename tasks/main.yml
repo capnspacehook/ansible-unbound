@@ -13,7 +13,7 @@
     creates: /var/lib/unbound/root.key
   register: unbound_anchor
   failed_when: |
-    unbound_anchor.rc == 0 and 
+    unbound_anchor.rc == 0 and
     unbound_anchor.stderr is defined and
     ("Please check root.key" in unbound_anchor.stderr or
     "error:" in unbound_anchor.stderr)
